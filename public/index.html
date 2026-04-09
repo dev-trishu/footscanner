@@ -1,0 +1,51 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test</title>
+</head>
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+  }
+
+  video {
+    max-width: 100%;
+  }
+
+  button {
+    margin-top: 20px;
+  }
+</style>
+
+<body>
+
+  <h1>Foot Scanner</h1>
+
+  <video id="video" width="300" autoplay></video>
+  <canvas id="canvas" width="300" height="400"></canvas>
+ <button id="captureBtn" style="padding:15px 30px; font-size:18px;">
+    📸 Capture
+  </button>
+<button id="retakeBtn" style="display:none;">🔄 Retake</button>
+  <script>
+    var Module = {
+      onRuntimeInitialized() {
+        console.log("OpenCV fully loaded");
+        window.cvReady = true;
+      }
+    };
+
+    
+  </script>
+
+  <script src="https://docs.opencv.org/4.x/opencv.js"></script>
+  <script src="assets/js/camera.js"></script>
+  <script src="assets/js/imageProcessor.js"></script>
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
