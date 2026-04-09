@@ -9,28 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const camera = new Camera(video, canvas);
   camera.start();
 
-  // ✅ Create processor
   const processor = new ImageProcessor("canvas");
 
-  captureBtn.addEventListener("click", function () {
+  captureBtn.addEventListener("click", () => {
 
-    // Capture frame
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // UI switch
     video.style.display = "none";
     canvas.style.display = "block";
     captureBtn.style.display = "none";
     retakeBtn.style.display = "inline-block";
 
-    // 🔥 Measure foot (correct call)
     processor.measureFoot();
   });
 
-  // captureBtn.addEventListener("click", () => {
-  //   alert("Button clicked!");
-  // });
-  retakeBtn.addEventListener("click", function () {
+  retakeBtn.addEventListener("click", () => {
     video.style.display = "block";
     canvas.style.display = "none";
     captureBtn.style.display = "inline-block";

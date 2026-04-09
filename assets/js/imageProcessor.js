@@ -3,30 +3,10 @@ class ImageProcessor {
     this.canvasId = canvasId;
   }
 
-  // Optional: preview grayscale
-  processImage() {
-    if (!window.cv) {
-      alert("OpenCV not loaded");
-      return;
-    }
-
-    let src = cv.imread(this.canvasId);
-    let gray = new cv.Mat();
-
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-    cv.imshow(this.canvasId, gray);
-
-    src.delete();
-    gray.delete();
-
-    console.log("Preview done");
-  }
-
-  // 🔥 MAIN FUNCTION (Accurate Foot Measurement)
   measureFoot() {
 
-    if (!window.cv) {
-      alert("OpenCV not loaded");
+    if (!window.cvReady) {
+      alert("OpenCV not ready");
       return;
     }
 
@@ -36,18 +16,18 @@ class ImageProcessor {
     let contours = new cv.MatVector();
     let hierarchy = new cv.Mat();
 
-    // STEP 1: Preprocess
+    // STEP 1: preprocess
     cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
     cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0);
     cv.Canny(gray, edges, 50, 150);
 
-    // STEP 2: Find contours
+    // STEP 2: find contours
     cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
     let paperContour = null;
     let maxArea = 0;
 
-    // STEP 3: Detect A4 paper
+    // STEP 3: detect A4 paper
     for (let i = 0; i < contours.size(); i++) {
       let cnt = contours.get(i);
       let area = cv.contourArea(cnt);
@@ -63,11 +43,11 @@ class ImageProcessor {
     }
 
     if (!paperContour) {
-      alert("❌ A4 paper not detected! Make sure paper is clearly visible.");
+      alert("Paper not detected");
       return;
     }
 
-    // STEP 4: Perspective transform
+    // STEP 4: perspective transform
     let pts = [];
     for (let i = 0; i < 4; i++) {
       pts.push({
@@ -76,7 +56,6 @@ class ImageProcessor {
       });
     }
 
-    // Sort points
     pts.sort((a, b) => a.y - b.y);
     let top = pts.slice(0, 2).sort((a, b) => a.x - b.x);
     let bottom = pts.slice(2, 4).sort((a, b) => a.x - b.x);
@@ -90,7 +69,6 @@ class ImageProcessor {
       ordered[3].x, ordered[3].y
     ]);
 
-    // A4 size (pixels)
     let width = 595;
     let height = 842;
 
@@ -106,7 +84,7 @@ class ImageProcessor {
 
     cv.warpPerspective(src, warped, M, new cv.Size(width, height));
 
-    // STEP 5: Detect foot
+    // STEP 5: detect foot (🔥 FIXED)
     let gray2 = new cv.Mat();
     let thresh = new cv.Mat();
     let contours2 = new cv.MatVector();
@@ -123,6 +101,12 @@ class ImageProcessor {
       let cnt = contours2.get(i);
       let area = cv.contourArea(cnt);
 
+      // ❗ Ignore paper (too big)
+      if (area > 300000) continue;
+
+      // ❗ Ignore noise (too small)
+      if (area < 5000) continue;
+
       if (area > maxArea2) {
         maxArea2 = area;
         footContour = cnt;
@@ -130,30 +114,25 @@ class ImageProcessor {
     }
 
     if (!footContour) {
-      alert("❌ Foot not detected!");
+      alert("Foot not detected properly");
       return;
     }
 
-    // STEP 6: Measure foot
+    // STEP 6: measure
     let rect = cv.minAreaRect(footContour);
     let footPixelLength = Math.max(rect.size.width, rect.size.height);
 
-    // Convert to cm (A4 height = 29.7 cm)
     let pixelsPerCm = 842 / 29.7;
-    let footLengthCm = footPixelLength / pixelsPerCm;
+    let cm = footPixelLength / pixelsPerCm;
 
-    // STEP 7: Size suggestion
-    let size = this.getSize(footLengthCm);
+    alert("Foot: " + cm.toFixed(2) + " cm\nSize: " + this.getSize(cm));
 
-    alert(`✅ Foot Length: ${footLengthCm.toFixed(2)} cm\n👟 Size: ${size}`);
-
-    // Cleanup
+    // cleanup
     src.delete(); gray.delete(); edges.delete();
     contours.delete(); hierarchy.delete();
     warped.delete(); gray2.delete(); thresh.delete(); contours2.delete();
   }
 
-  // 👟 Size logic
   getSize(cm) {
     if (cm < 22) return 4;
     else if (cm < 23) return 5;
