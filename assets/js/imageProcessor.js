@@ -90,8 +90,19 @@ class ImageProcessor {
     let contours2 = new cv.MatVector();
 
     cv.cvtColor(warped, gray2, cv.COLOR_RGBA2GRAY);
-    cv.threshold(gray2, thresh, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU);
+   cv.adaptiveThreshold(
+      gray2,
+      thresh,
+      255,
+      cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+      cv.THRESH_BINARY_INV,
+      11,
+      2
+    );
 
+    let kernel = cv.Mat.ones(5, 5, cv.CV_8U);
+    cv.morphologyEx(thresh, thresh, cv.MORPH_CLOSE, kernel);
+    kernel.delete();
     cv.findContours(thresh, contours2, new cv.Mat(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
     let footContour = null;
@@ -101,11 +112,11 @@ class ImageProcessor {
       let cnt = contours2.get(i);
       let area = cv.contourArea(cnt);
 
-      // ❗ Ignore paper (too big)
-      if (area > 300000) continue;
+      // ignore noise
+      if (area < 8000) continue;
 
-      // ❗ Ignore noise (too small)
-      if (area < 5000) continue;
+      // ignore paper
+      if (area > 250000) continue;
 
       if (area > maxArea2) {
         maxArea2 = area;
