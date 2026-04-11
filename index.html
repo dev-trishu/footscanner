@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Foot Scanner</title>
+  <title>Scanner</title>
 
   <style>
     body {
@@ -23,6 +23,7 @@
 
     video {
       width: 100%;
+      border-radius: 10px;
     }
 
     /* Message */
@@ -50,46 +51,52 @@
       100% { top: 100%; }
     }
 
-    /* Result box */
+    /* Result */
     .result {
       margin-top: 20px;
-      font-size: 20px;
+      font-size: 18px;
       display: none;
+      padding: 15px;
+      background: #111;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <h2>👣 Foot Scanner</h2>
+  <h2>📷 Scanner</h2>
 
   <div class="camera-container">
     <video id="video" autoplay playsinline></video>
 
-    <div class="message" id="msg">Scanning Foot...</div>
-    <div class="scan-line"></div>
+    <div class="message" id="msg">Starting Camera...</div>
+    <div class="scan-line" id="scanLine"></div>
   </div>
 
   <div class="result" id="result">
-    ✅ Scan Complete! <br>
-    Foot Size: 9 (Example)
+    ⚠️ Shopify does not allow this feature.
   </div>
 
   <script>
     const video = document.getElementById("video");
     const msg = document.getElementById("msg");
     const result = document.getElementById("result");
+    const scanLine = document.getElementById("scanLine");
 
-    // Open camera
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(() => {
-        alert("Camera permission denied ❌");
-      });
+    // Open BACK camera
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" }
+    })
+    .then(stream => {
+      video.srcObject = stream;
+      msg.innerText = "Scanning...";
+    })
+    .catch(() => {
+      alert("Camera permission denied ❌");
+    });
 
-    // Fake scanning process
+    // Fake scanning steps
     setTimeout(() => {
       msg.innerText = "Analyzing...";
     }, 2000);
@@ -100,7 +107,7 @@
 
     setTimeout(() => {
       msg.style.display = "none";
-      document.querySelector(".scan-line").style.display = "none";
+      scanLine.style.display = "none";
       result.style.display = "block";
     }, 6000);
   </script>
