@@ -6,34 +6,35 @@
   <style>
     body {
       margin: 0;
-      padding: 20px;
       font-family: Arial;
-      text-align: center;
       background: black;
       color: white;
+      overflow: hidden;
     }
 
     .camera-container {
-      position: relative;
-      width: 300px;
-      margin: auto;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
-      border-radius: 10px;
     }
 
     video {
       width: 100%;
-      border-radius: 10px;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Message */
     .message {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: 20px;
+      left: 20px;
       background: rgba(0,0,0,0.6);
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 16px;
     }
 
@@ -51,31 +52,42 @@
       100% { top: 100%; }
     }
 
-    /* Result */
+    /* Result (Error Box) */
     .result {
-      margin-top: 20px;
-      font-size: 18px;
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 420px;
+      font-size: 15px;
       display: none;
-      padding: 15px;
-      background: #111;
-      border-radius: 10px;
+      padding: 18px;
+      background: rgba(10,10,10,0.95);
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid #ff3b3b;
+      color: #ffcccc;
+      line-height: 1.5;
+      box-shadow: 0 0 20px rgba(255,0,0,0.25);
     }
   </style>
 </head>
 
 <body>
 
-  <h2>📷 Scanner</h2>
-
   <div class="camera-container">
     <video id="video" autoplay playsinline></video>
 
-    <div class="message" id="msg">Starting Camera...</div>
+    <div class="message" id="msg">Initializing Camera...</div>
     <div class="scan-line" id="scanLine"></div>
-  </div>
 
-  <div class="result" id="result">
-    ⚠️ Shopify does not allow this feature.
+    <div class="result" id="result">
+      ⚠️ AR Feature Unavailable<br><br>
+      This feature is not supported in the current environment.<br>
+      Shopify restricts access to advanced camera and AR capabilities within its in-app browser.<br><br>
+
+    </div>
   </div>
 
   <script>
@@ -93,16 +105,16 @@
       msg.innerText = "Scanning...";
     })
     .catch(() => {
-      alert("Camera permission denied ❌");
+      msg.innerText = "Camera access blocked ❌";
     });
 
-    // Fake scanning steps
+    // Fake scanning flow
     setTimeout(() => {
-      msg.innerText = "Analyzing...";
+      msg.innerText = "Analyzing environment...";
     }, 2000);
 
     setTimeout(() => {
-      msg.innerText = "Processing...";
+      msg.innerText = "Detecting AR support...";
     }, 4000);
 
     setTimeout(() => {
