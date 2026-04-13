@@ -55,21 +55,27 @@
     /* Result (Error Box) */
     .result {
       position: absolute;
-      bottom: 30px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
+      transform: translate(-50%, -50%);
+      
+      width: 85%;
       max-width: 420px;
+
       font-size: 15px;
       display: none;
-      padding: 18px;
+      padding: 20px;
+
       background: rgba(10,10,10,0.95);
       border-radius: 12px;
       text-align: center;
+
       border: 1px solid #ff3b3b;
       color: #ffcccc;
-      line-height: 1.5;
-      box-shadow: 0 0 20px rgba(255,0,0,0.25);
+      line-height: 1.6;
+
+      box-shadow: 0 0 25px rgba(255,0,0,0.3);
+      z-index: 10;
     }
   </style>
 </head>
